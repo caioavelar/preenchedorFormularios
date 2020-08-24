@@ -1,8 +1,13 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     console.log(msg, sender, response);
     if(msg.key === 'init') {
-        preencherCampos();
-        return response({success: true});
+        try {
+            preencherCampos();
+            return response({success: true});
+        } catch (error) {
+            console.error(error);
+            return response({success: false});
+        }
     }
     return response({success: false});
  });
@@ -14,31 +19,37 @@ function preencherCampos() {
     console.log(form);
     for(let i = 0; i < form.elements.length; i++) {
         const elemento = form.elements[i];
-        console.log(elemento.type);
-        if(elemento.type.toLowerCase() === 'text') {
-            // Decidir o que inserir em texto com base no nome
-            setInputTextValue(elemento);
-        } else if (elemento.type.toLowerCase() === 'textarea') {
-            // Decidir o tamanho do texto que será criado 
-            elemento.value = getLoremIpsumText(elemento.maxLength);
-        } else if (elemento.type.toLowerCase() === 'number') {
-            // Decidir o que inserir de número com base no nome
-            elemento.value = getRandomNumber(elemento.max ? elemento.max : 1000);
-        } else if (elemento.type.toLowerCase() === 'date') {
-            // Decidir o que inserir de data com base no nome
-            elemento.value = randomDate(new Date(), new Date());
-        } else if (elemento.type.toLowerCase().includes('select')) {
-            // Recuperar opções e selecionar uma aleatoriamente
-            console.log('sou um select')
-            const options = elemento.options;
-            console.log(options.length);
-            let index = getRandomNumber(options.length);
-            console.log(options[index], index);
-            if(options[index].value) {
-                elemento.value = options[index].value;
-                setElementValue(elemento, options[index].value);
-            } else {
-                // Talvez, criar uma função para recuperar options aleatoriamente, ou abstrair essa lógica para uma função
+        console.log(elemento.value);
+        if(elemento.value) {
+            console.log('Elemento '+ elemento.name + ' Tem valor');
+        } else {
+            if(elemento.type.toLowerCase() === 'text') {
+                // Decidir o que inserir em texto com base no nome
+                setInputTextValue(elemento);
+            } else if (elemento.type.toLowerCase() === 'email') {
+                setInputEmailValue(elemento);
+            } else if (elemento.type.toLowerCase() === 'textarea') {
+                // Decidir o tamanho do texto que será criado 
+                elemento.value = getLoremIpsumText(elemento.maxLength);
+            } else if (elemento.type.toLowerCase() === 'number') {
+                // Decidir o que inserir de número com base no nome
+                elemento.value = getRandomNumber(elemento.max ? elemento.max : 1000);
+            } else if (elemento.type.toLowerCase() === 'date') {
+                // Decidir o que inserir de data com base no nome
+                elemento.value = randomDate(new Date(), new Date());
+            } else if (elemento.type.toLowerCase().includes('select')) {
+                // Recuperar opções e selecionar uma aleatoriamente
+                console.log('sou um select')
+                const options = elemento.options;
+                console.log(options.length);
+                let index = getRandomNumber(options.length);
+                console.log(options[index], index);
+                if(options[index].value) {
+                    elemento.value = options[index].value;
+                    setElementValue(elemento, options[index].value);
+                } else {
+                    // Talvez, criar uma função para recuperar options aleatoriamente, ou abstrair essa lógica para uma função
+                }
             }
         }
     }
@@ -67,7 +78,15 @@ function setInputTextValue(elemento) {
         console.log('Sou um input document Number')
         return setElementValue(elemento, elemento.maxLength === 11 ? generateRandomCPF() : generateRandomCNPJ());
     }
+    if(elemento.type.toLowerCase() === 'email') { // Melhorar essa lógica de validação de campos, está espalhada por todo o código
+        return setInputEmailValue(elemento);
+    }
     setElementValue(elemento, 'String randômica');
+}
+
+function setInputEmailValue(elemento) {
+    let email = +new Date() + '@a.com';
+    setElementValue(elemento, email);
 }
 
 function isDocumentNumberInput(elemento) {
