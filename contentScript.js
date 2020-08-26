@@ -82,6 +82,14 @@ function setInputTextValue(elemento) {
     if(isEmailInput(elemento)) { // Melhorar essa lógica de validação de campos, está espalhada por todo o código
         return setInputEmailValue(elemento);
     }
+    if(isCellphoneInput(elemento)) { 
+        console.log('randomcellphone');
+        return setElementValue(elemento, generateRandomCellphone());
+    }
+    if(isPhoneNumberInput(elemento)) {
+        console.log('sou phone number');
+        return setElementValue(elemento, generateRandomPhoneNumber());
+    }
     setElementValue(elemento, 'String randômica');
 }
 
