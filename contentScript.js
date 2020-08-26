@@ -1,5 +1,4 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
-    console.log(msg, sender, response);
     if(msg.key === 'init') {
         try {
             preencherCampos();
@@ -14,19 +13,17 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 
 
 function preencherCampos() {
-    console.log('Iniciando função');
     const form = document.getElementsByTagName('form')[0];
     console.log(form);
     for(let i = 0; i < form.elements.length; i++) {
         const elemento = form.elements[i];
-        console.log(elemento.value);
         if(elemento.value) {
             console.log('Elemento '+ elemento.name + ' Tem valor');
         } else {
             if(elemento.type.toLowerCase() === 'text') {
                 // Decidir o que inserir em texto com base no nome
                 setInputTextValue(elemento);
-            } else if (elemento.type.toLowerCase() === 'email') {
+            } else if (isEmailInput(elemento)) {
                 setInputEmailValue(elemento);
             } else if (elemento.type.toLowerCase() === 'textarea') {
                 // Decidir o tamanho do texto que será criado 
@@ -74,11 +71,15 @@ function randomDate(start, end) {
 
 function setInputTextValue(elemento) {
     if(!elemento) return;
-    if(isDocumentNumberInput(elemento)) {
-        console.log('Sou um input document Number')
-        return setElementValue(elemento, elemento.maxLength === 11 ? generateRandomCPF() : generateRandomCNPJ());
+    if(isCPFInput(elemento)) {
+        console.log('Sou um input CPF')
+        return setElementValue(elemento, generateRandomCPF());
     }
-    if(elemento.type.toLowerCase() === 'email') { // Melhorar essa lógica de validação de campos, está espalhada por todo o código
+    if(isCNPJInput(elemento)) {
+        console.log('Sou um input CNPJ')
+        return setElementValue(elemento, generateRandomCNPJ());
+    }
+    if(isEmailInput(elemento)) { // Melhorar essa lógica de validação de campos, está espalhada por todo o código
         return setInputEmailValue(elemento);
     }
     setElementValue(elemento, 'String randômica');
@@ -89,21 +90,14 @@ function setInputEmailValue(elemento) {
     setElementValue(elemento, email);
 }
 
-function isDocumentNumberInput(elemento) {
-    console.log(elemento.name.toLowerCase())
-    if(elemento.name) {
-        return elemento.name.toLowerCase().indexOf('cpf') >= 0 || elemento.name.toLowerCase().indexOf('cnpj') >= 0 || elemento.name.toLowerCase().indexOf('documentnumber') >= 0;
-    }
-    if(elemento.id) {
-        return elemento.id.toLowerCase().indexOf('cpf') >= 0 || elemento.id.toLowerCase().indexOf('cnpj') >= 0 || elemento.id.toLowerCase().indexOf('documentnumber') >= 0;
-    }
-}
-
 function setElementValue(elemento, value) {
     if(!elemento || !value) return;
 
     try {
         elemento.value = value;
+        elemento.dispatchEvent(new Event('input', { bubbles: true }));
+        elemento.dispatchEvent(new Event('focus', { bubbles: true }));
+        elemento.dispatchEvent(new Event('blur', { bubbles: true }));
     } catch (error) {
         console.error(error);
     }

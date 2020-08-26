@@ -10,13 +10,8 @@
         {
           "matches": ["http://*/*", "https://*/*"],
           "css": ["styles.css"],
-          "js": ["contentScript.js"]
-        },
-        {
-            "matches": ["http://*/*", "https://*/*"],
-            "css": ["styles.css"],
-            "js": ["utils.js"]
-          }
+          "js": ["utils.js","validators.js","contentScript.js"]
+        }
       ],
     "permissions": ["https://*.google.com/", "activeTab"],
     "browser_action": {
