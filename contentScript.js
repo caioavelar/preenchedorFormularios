@@ -11,12 +11,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
     return response({success: false});
  });
 
-
 function preencherCampos() {
     const form = document.getElementsByTagName('form')[0];
     console.log(form);
     for(let i = 0; i < form.elements.length; i++) {
         const elemento = form.elements[i];
+        if(!(elemento.offsetWidth > 0 && elemento.offsetHeight > 0)) {
+            continue;
+        }
         if(elemento.value) {
             console.log('Elemento '+ elemento.name + ' Tem valor');
         } else {

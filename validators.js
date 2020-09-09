@@ -44,6 +44,12 @@ function isEmailInput(elemento) {
         return true;
     }
     return elementHasSpecificNameOrId(elemento, 'email');
+}
+
+function isCepInput(elemento) {
+    if(elementHasSpecificNameOrId(elemento, 'cep')) {
+        return true;
+    }
     return false;
 }
 
