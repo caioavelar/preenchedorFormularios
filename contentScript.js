@@ -14,15 +14,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 function preencherCampos() {
     const forms =document.getElementsByTagName('form');
     for(const form of forms) {
-        console.log(form);
         for(let i = 0; i < form.elements.length; i++) {
             const elemento = form.elements[i];
             if(!(elemento.offsetWidth > 0 && elemento.offsetHeight > 0)) {
                 continue;
             }
-            if(elemento.value) {
-                console.log('Elemento '+ elemento.name + ' Tem valor');
-            } else {
+            if(!elemento.value) {
                 if(elemento.type.toLowerCase() === 'text') {
                     // Decidir o que inserir em texto com base no nome
                     setInputTextValue(elemento);
@@ -34,15 +31,13 @@ function preencherCampos() {
                 } else if (elemento.type.toLowerCase() === 'number') {
                     // Decidir o que inserir de número com base no nome
                     elemento.value = getRandomNumber(elemento.max ? elemento.max : 1000);
-                } else if (elemento.type.toLowerCase() === 'date') {
-                    // Decidir o que inserir de data com base no nome
-                    elemento.value = randomDate(new Date(), new Date());
+                } else if (isDateInput(elemento)) {
+                    console.error('Só avisando que sou uma data');
+                    elemento.value = getDateAsString(new Date(), new Date());
                 } else if (elemento.type.toLowerCase().includes('select')) {
                     // Recuperar opções e selecionar uma aleatoriamente
                     const options = elemento.options;
-                    console.log(options.length);
                     let index = getRandomNumber(options.length);
-                    console.log(options[index], index);
                     if(options[index].value) {
                         elemento.value = options[index].value;
                         setElementValue(elemento, options[index].value);
@@ -60,8 +55,8 @@ function getLoremIpsumText(tamanho) {
     return loremIpsumText.substr(0, tamanho);
 }
 
-function randomDate(start, end) {
-    const d = new Date(start.getTime() + Math.random() * (end.getTime() -                     start.getTime()));
+function getDateAsString(start, end) {
+    const d = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     let month = '' + (d.getMonth() + 1);
     let day = '' + d.getDate();
     let year = d.getFullYear();
@@ -75,23 +70,23 @@ function randomDate(start, end) {
 function setInputTextValue(elemento) {
     if(!elemento) return;
     if(isCPFInput(elemento)) {
-        console.log('Sou um input CPF')
         return setElementValue(elemento, generateRandomCPF());
     }
     if(isCNPJInput(elemento)) {
-        console.log('Sou um input CNPJ')
         return setElementValue(elemento, generateRandomCNPJ());
     }
     if(isEmailInput(elemento)) { // Melhorar essa lógica de validação de campos, está espalhada por todo o código
         return setInputEmailValue(elemento);
     }
     if(isCellphoneInput(elemento)) { 
-        console.log('randomcellphone');
         return setElementValue(elemento, generateRandomCellphone());
     }
     if(isPhoneNumberInput(elemento)) {
-        console.log('sou phone number');
         return setElementValue(elemento, generateRandomPhoneNumber());
+    }
+
+    if(isDateInput(elemento)) {
+        return setElementValue(elemento, getDateAsString(new Date(), new Date()));
     }
     setElementValue(elemento, 'String randômica');
 }
