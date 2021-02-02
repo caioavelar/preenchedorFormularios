@@ -12,46 +12,47 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
  });
 
 function preencherCampos() {
-    const form = document.getElementsByTagName('form')[0];
-    console.log(form);
-    for(let i = 0; i < form.elements.length; i++) {
-        const elemento = form.elements[i];
-        if(!(elemento.offsetWidth > 0 && elemento.offsetHeight > 0)) {
-            continue;
-        }
-        if(elemento.value) {
-            console.log('Elemento '+ elemento.name + ' Tem valor');
-        } else {
-            if(elemento.type.toLowerCase() === 'text') {
-                // Decidir o que inserir em texto com base no nome
-                setInputTextValue(elemento);
-            } else if (isEmailInput(elemento)) {
-                setInputEmailValue(elemento);
-            } else if (elemento.type.toLowerCase() === 'textarea') {
-                // Decidir o tamanho do texto que será criado 
-                elemento.value = getLoremIpsumText(elemento.maxLength);
-            } else if (elemento.type.toLowerCase() === 'number') {
-                // Decidir o que inserir de número com base no nome
-                elemento.value = getRandomNumber(elemento.max ? elemento.max : 1000);
-            } else if (elemento.type.toLowerCase() === 'date') {
-                // Decidir o que inserir de data com base no nome
-                elemento.value = randomDate(new Date(), new Date());
-            } else if (elemento.type.toLowerCase().includes('select')) {
-                // Recuperar opções e selecionar uma aleatoriamente
-                console.log('sou um select')
-                const options = elemento.options;
-                console.log(options.length);
-                let index = getRandomNumber(options.length);
-                console.log(options[index], index);
-                if(options[index].value) {
-                    elemento.value = options[index].value;
-                    setElementValue(elemento, options[index].value);
-                } else {
-                    // Talvez, criar uma função para recuperar options aleatoriamente, ou abstrair essa lógica para uma função
+    const forms =document.getElementsByTagName('form');
+    for(const form of forms) {
+        console.log(form);
+        for(let i = 0; i < form.elements.length; i++) {
+            const elemento = form.elements[i];
+            if(!(elemento.offsetWidth > 0 && elemento.offsetHeight > 0)) {
+                continue;
+            }
+            if(elemento.value) {
+                console.log('Elemento '+ elemento.name + ' Tem valor');
+            } else {
+                if(elemento.type.toLowerCase() === 'text') {
+                    // Decidir o que inserir em texto com base no nome
+                    setInputTextValue(elemento);
+                } else if (isEmailInput(elemento)) {
+                    setInputEmailValue(elemento);
+                } else if (elemento.type.toLowerCase() === 'textarea') {
+                    // Decidir o tamanho do texto que será criado 
+                    elemento.value = getLoremIpsumText(elemento.maxLength);
+                } else if (elemento.type.toLowerCase() === 'number') {
+                    // Decidir o que inserir de número com base no nome
+                    elemento.value = getRandomNumber(elemento.max ? elemento.max : 1000);
+                } else if (elemento.type.toLowerCase() === 'date') {
+                    // Decidir o que inserir de data com base no nome
+                    elemento.value = randomDate(new Date(), new Date());
+                } else if (elemento.type.toLowerCase().includes('select')) {
+                    // Recuperar opções e selecionar uma aleatoriamente
+                    const options = elemento.options;
+                    console.log(options.length);
+                    let index = getRandomNumber(options.length);
+                    console.log(options[index], index);
+                    if(options[index].value) {
+                        elemento.value = options[index].value;
+                        setElementValue(elemento, options[index].value);
+                    } else {
+                        // Talvez, criar uma função para recuperar options aleatoriamente, ou abstrair essa lógica para uma função
+                    }
                 }
             }
         }
-    }
+    } 
 }
 
 function getLoremIpsumText(tamanho) {
